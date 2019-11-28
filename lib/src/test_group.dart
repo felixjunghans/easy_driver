@@ -31,6 +31,12 @@ abstract class TestGroup {
   Future<bool> isReady({Duration timeout}) async =>
       await widgetExists(_driver.driver, screenFinder);
 
+  Future<void> expectWidget(SerializableFinder finder) =>
+      widgetExists(_driver.driver, finder);
+
+  Future<void> expectWidgetAbsent(SerializableFinder finder) =>
+      widgetAbsent(_driver.driver, finder);
+
   @protected
   @mustCallSuper
   Future<void> connectDriver() async {
