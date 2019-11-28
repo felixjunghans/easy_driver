@@ -1,6 +1,6 @@
-# easy_driver_example
+# example
 
-Demonstrates how to use the easy_driver plugin.
+A new Flutter project.
 
 ## Getting Started
 

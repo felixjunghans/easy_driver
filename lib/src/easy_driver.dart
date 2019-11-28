@@ -8,19 +8,20 @@ class EasyDriver {
     List<TestGroup> testGroups = const <TestGroup>[],
     bool withNavigation = false,
     bool withScreenshots = true,
-    String screenShotDirectory = 'screenshots',
+    String reportDirectory = 'easydriver',
   }) {
     setUpAll(() async {
       if (withScreenshots) {
         warning(screenShotWarning);
-        await createDirectory(screenShotDirectory);
+        await createDirectory(reportDirectory);
       }
     });
 
     for (TestGroup testGroup in testGroups) {
       testGroup.runTests(
           withNavigation: withNavigation,
-          screenShotDirectory: withScreenshots ? screenShotDirectory : null);
+          withScreenshots: withScreenshots,
+          reportDirectory: reportDirectory);
     }
   }
 

@@ -30,6 +30,7 @@
 build/
 res/
 lib/generated/
+example/easydriver/
 
 # Android related
 **/android/**/gradle-wrapper.jar

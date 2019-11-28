@@ -1,3 +1,4 @@
+
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -41,11 +42,11 @@ class _MyAppState extends State<MyApp> {
             },
             items: List.generate(
                 100,
-                (x) => DropdownMenuItem<int>(
-                      key: Key("item_$x"),
-                      value: x,
-                      child: Text('Select element ' + x.toString()),
-                    )),
+                    (x) => DropdownMenuItem<int>(
+                  key: Key("item_$x"),
+                  value: x,
+                  child: Text('Select element ' + x.toString()),
+                )),
           )
         ]),
       ),

@@ -1,4 +1,4 @@
-package de.felixjunghans.easy_driver_example
+package com.example.example
 
 import android.os.Bundle
 

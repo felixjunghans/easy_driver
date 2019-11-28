@@ -7,7 +7,8 @@ import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 abstract class TestGroup {
-  String _screenShotDirectory;
+  String _reportDirectory;
+  bool _withScreenshots;
 
   DriverExtension _driver;
 
@@ -50,29 +51,47 @@ abstract class TestGroup {
   List<TestElement> get tests;
 
   Future<void> screenShot(String title) async {
-    if (_screenShotDirectory != null) {
-      await takeScreenshot(
-          title, "$_screenShotDirectory/$_groupFolderName", _driver.driver);
+    if (_withScreenshots) {
+      await takeScreenshot(title,
+          "$_reportDirectory/$_groupFolderName/screenshots", _driver.driver);
     }
+  }
+
+  Future<void> traceAction(Function test, String title) async {
+    final timeline = await _driver.driver.traceAction(() async {
+      await test();
+    });
+    final summary = new TimelineSummary.summarize(timeline);
+    summary.writeSummaryToFile(title,
+        destinationDirectory:
+            "$_reportDirectory/$_groupFolderName/performance/",
+        pretty: true);
   }
 
   void runTests({
     bool withNavigation = false,
-    String screenShotDirectory,
+    bool withScreenshots = true,
+    String reportDirectory,
   }) async {
     group(testGroupName, () {
       setUpAll(() async {
         await connectDriver();
         _driver.currentScreenFinder = screenFinder;
-        _screenShotDirectory = screenShotDirectory;
+        _reportDirectory = reportDirectory;
+        _withScreenshots = withScreenshots;
 
         if (withNavigation) {
           info(navigationInfo);
           await navigateToScreen();
         }
 
-        if (screenShotDirectory != null) {
-          await createDirectory("$screenShotDirectory/$_groupFolderName");
+        await createDirectory("$_reportDirectory/$_groupFolderName");
+        await createDirectory(
+            "$_reportDirectory/$_groupFolderName/performance");
+
+        if (withScreenshots) {
+          await createDirectory(
+              "$_reportDirectory/$_groupFolderName/screenshots");
         }
       });
 
@@ -81,7 +100,7 @@ abstract class TestGroup {
       });
 
       for (TestElement test in tests) {
-        test.run(screenShot: screenShot);
+        test.run(screenShot: screenShot, traceAction: traceAction);
       }
 
       tearDownAll(() async {
