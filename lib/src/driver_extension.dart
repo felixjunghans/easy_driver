@@ -62,7 +62,10 @@ class DriverExtension {
     assert(dxScroll != 0.0 || dyScroll != 0.0);
 
     bool isVisible = false;
-
+    _driver.waitFor(item, timeout: timeout).then<void>((_) {
+      isVisible = true;
+    });
+    
     await Future<void>.delayed(const Duration(milliseconds: 1000));
     while (!isVisible) {
       await _driver.scroll(
