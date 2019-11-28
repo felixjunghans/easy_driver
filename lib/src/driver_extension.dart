@@ -50,7 +50,7 @@ class DriverExtension {
     double alignment = 0.0,
     double dxScroll = 0.0,
     double dyScroll = 0.0,
-    Duration timeout,
+    Duration timeout = const Duration(seconds: 30),
   }) async {
     assert(scrollable != null);
     assert(item != null);
@@ -66,7 +66,8 @@ class DriverExtension {
     await Future<void>.delayed(const Duration(milliseconds: 1000));
     while (!isVisible) {
       await _driver.scroll(
-          scrollable, 0.0, -400.0, const Duration(milliseconds: 50));
+          scrollable, 0.0, -400.0, const Duration(milliseconds: 50),
+          timeout: timeout);
       dyOffset += -405;
       await Future<void>.delayed(const Duration(milliseconds: 100));
     }
@@ -76,7 +77,8 @@ class DriverExtension {
 
   Future<void> resetScreenScrollPosition(SerializableFinder scrollable,
       {double dx = 0, double dy = 10000}) async {
-    await _driver.scroll(scrollable, dx, dy, const Duration(milliseconds: 100));
+    await _driver.scroll(scrollable, dx, dy, const Duration(milliseconds: 100),
+        timeout: Duration(seconds: 30));
     dyOffset = 0;
     dxOffset = 0;
   }
@@ -136,7 +138,7 @@ class DriverExtension {
   Future<void> findAndTap(SerializableFinder finder,
       {Duration timeout, SerializableFinder scrollable}) async {
     await _findBeforeAction(finder, scrollable: scrollable);
-    await  _driver.tap(finder, timeout: timeout);
+    await _driver.tap(finder, timeout: timeout);
     await _resetAfterAction(scrollable);
   }
 
