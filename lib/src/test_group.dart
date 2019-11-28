@@ -31,11 +31,13 @@ abstract class TestGroup {
   Future<bool> isReady({Duration timeout}) async =>
       await widgetExists(_driver.driver, screenFinder);
 
-  Future<void> expectWidget(SerializableFinder finder) =>
-      widgetExists(_driver.driver, finder);
+  Future<void> expectWidget(SerializableFinder finder) async {
+    expect(await widgetExists(_driver.driver, finder), isTrue);
+  }
 
-  Future<void> expectWidgetAbsent(SerializableFinder finder) =>
-      widgetAbsent(_driver.driver, finder);
+  Future<void> expectWidgetAbsent(SerializableFinder finder) async {
+    expect(await widgetAbsent(_driver.driver, finder), isTrue);
+  }
 
   @protected
   @mustCallSuper
@@ -79,9 +81,13 @@ abstract class TestGroup {
     bool withScreenshots = true,
     String reportDirectory,
   }) async {
+    IsolatesWorkaround workaround;
     group(testGroupName, () {
       setUpAll(() async {
         await connectDriver();
+        workaround = IsolatesWorkaround(_driver.driver);
+        await workaround.resumeIsolates();
+
         _driver.currentScreenFinder = screenFinder;
         _reportDirectory = reportDirectory;
         _withScreenshots = withScreenshots;
@@ -111,6 +117,7 @@ abstract class TestGroup {
 
       tearDownAll(() async {
         await closeDriver();
+        await workaround.tearDown();
       });
     });
   }
