@@ -127,77 +127,98 @@ class DriverExtension {
   }
 
   Future<void> findAndDoubleTap(SerializableFinder finder,
-      {Duration timeout}) async {
-    await _findBeforeAction(finder);
+      {Duration timeout, SerializableFinder scrollable}) async {
+    await _findBeforeAction(finder, scrollable: scrollable);
     _driver.tap(finder);
     await _driver.tap(finder, timeout: timeout);
   }
 
   Future<void> findAndLongPress(SerializableFinder finder,
-      {Duration timeout}) async {
-    await _findBeforeAction(finder);
+      {Duration timeout, SerializableFinder scrollable}) async {
+    await _findBeforeAction(finder, scrollable: scrollable);
     await _driver.scroll(finder, 0, 0, Duration(milliseconds: 500),
         timeout: timeout);
   }
 
   Future<void> tapByType(String target,
-      {Duration timeout, TapType type = TapType.tap}) async {
+      {Duration timeout,
+      TapType type = TapType.tap,
+      SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.type, target);
-    await _getAppropriateTap(type)(finder, timeout: timeout);
+    await _getAppropriateTap(type)(finder,
+        timeout: timeout, scrollable: scrollable);
   }
 
   Future<void> tapByText(String target,
-      {Duration timeout, TapType type = TapType.tap}) async {
+      {Duration timeout,
+      TapType type = TapType.tap,
+      SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.text, target);
-    await _getAppropriateTap(type)(finder, timeout: timeout);
+    await _getAppropriateTap(type)(finder,
+        timeout: timeout, scrollable: scrollable);
   }
 
   Future<void> tapByValueKey(String target,
-      {Duration timeout, TapType type = TapType.tap}) async {
+      {Duration timeout,
+      TapType type = TapType.tap,
+      SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.key, target);
-    await _getAppropriateTap(type)(finder, timeout: timeout);
+    await _getAppropriateTap(type)(finder,
+        timeout: timeout, scrollable: scrollable);
   }
 
   Future<void> tapBySemanticsLabel(String target,
-      {Duration timeout, TapType type = TapType.tap}) async {
+      {Duration timeout,
+      TapType type = TapType.tap,
+      SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.semanticsLabel, target);
-    await _getAppropriateTap(type)(finder, timeout: timeout);
+    await _getAppropriateTap(type)(finder,
+        timeout: timeout, scrollable: scrollable);
   }
 
   Future<void> tapByTooltip(String target,
-      {Duration timeout, TapType type = TapType.tap}) async {
+      {Duration timeout,
+      TapType type = TapType.tap,
+      SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.tooltip, target);
-    await _getAppropriateTap(type)(finder, timeout: timeout);
+    await _getAppropriateTap(type)(finder,
+        timeout: timeout, scrollable: scrollable);
   }
 
-  Future<void> findAndEnterText(SerializableFinder finder, String text) async {
-    await findAndTap(finder);
+  Future<void> findAndEnterText(SerializableFinder finder, String text,
+      {SerializableFinder scrollable}) async {
+    await findAndTap(finder, scrollable: scrollable);
     await _driver.enterText(text);
   }
 
-  Future<void> enterTextByType(String target, String text) async {
+  Future<void> enterTextByType(String target, String text,
+      {SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.type, target);
-    await findAndEnterText(finder, text);
+    await findAndEnterText(finder, text, scrollable: scrollable);
   }
 
-  Future<void> enterTextByText(String target, String text) async {
+  Future<void> enterTextByText(String target, String text,
+      {SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.text, target);
-    await findAndEnterText(finder, text);
+    await findAndEnterText(finder, text, scrollable: scrollable);
   }
 
-  Future<void> enterTextByValueKey(String target, String text) async {
+  Future<void> enterTextByValueKey(String target, String text,
+      {SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.key, target);
-    await findAndEnterText(finder, text);
+    await findAndEnterText(finder, text, scrollable: scrollable);
   }
 
-  Future<void> enterTextBySemanticsLabel(String target, String text) async {
+  Future<void> enterTextBySemanticsLabel(
+      String target, String text, SerializableFinder scrollable) async {
     final finder = _getAppropriateFinder(FinderType.semanticsLabel, target);
-    await findAndEnterText(finder, text);
+    await findAndEnterText(finder, text, scrollable: scrollable);
   }
 
-  Future<void> enterTextByTooltip(String target, String text) async {
+  Future<void> enterTextByTooltip(String target, String text,
+      {SerializableFinder scrollable}) async {
     final finder = _getAppropriateFinder(FinderType.tooltip, target);
-    await findAndEnterText(finder, text);
+    await findAndEnterText(finder, text, scrollable: scrollable);
   }
 
   Future<void> dismissOverlay([SerializableFinder modalBarrier]) async {
@@ -205,16 +226,6 @@ class DriverExtension {
       await findAndTap(modalBarrier);
     } else {
       await findAndTap(_getAppropriateFinder(FinderType.type, 'ModalBarrier'));
-    }
-  }
-
-  Future<bool> tryToTap(SerializableFinder item,
-      {SerializableFinder scrollable}) async {
-    try {
-      await _driver.tap(item, timeout: Duration(seconds: 1));
-      return true;
-    } catch (e) {
-      return false;
     }
   }
 
