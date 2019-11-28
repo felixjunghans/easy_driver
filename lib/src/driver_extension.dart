@@ -18,6 +18,8 @@ enum TapType {
 class DriverExtension {
   FlutterDriver _driver;
   SerializableFinder currentScreenFinder;
+  double dyOffset = 0;
+  double dxOffset = 0;
 
   DriverExtension._(this._driver) : assert(_driver != null);
 
@@ -60,20 +62,23 @@ class DriverExtension {
     assert(dxScroll != 0.0 || dyScroll != 0.0);
 
     bool isVisible = false;
-    await _driver.scroll(
-        scrollable, 0, 10000, const Duration(milliseconds: 100));
-    _driver.waitFor(item, timeout: timeout).then<void>((_) {
-      isVisible = true;
-    });
 
     await Future<void>.delayed(const Duration(milliseconds: 1000));
     while (!isVisible) {
       await _driver.scroll(
           scrollable, 0.0, -400.0, const Duration(milliseconds: 50));
+      dyOffset += -405;
       await Future<void>.delayed(const Duration(milliseconds: 100));
     }
 
-    return _driver.scrollIntoView(item, alignment: alignment);
+    await _driver.scrollIntoView(item, alignment: alignment);
+  }
+
+  Future<void> resetScreenScrollPosition(SerializableFinder scrollable,
+      {double dx = 0, double dy = 10000}) async {
+    await _driver.scroll(scrollable, dx, dy, const Duration(milliseconds: 100));
+    dyOffset = 0;
+    dxOffset = 0;
   }
 
   SerializableFinder _getAppropriateFinder(FinderType type, String target) {
@@ -120,10 +125,19 @@ class DriverExtension {
         dyScroll: 300, timeout: Duration(seconds: 30));
   }
 
+  Future<void> _resetAfterAction(SerializableFinder scrollable) async {
+    await resetScreenScrollPosition(
+      scrollable ?? currentScreenFinder,
+      dx: dxOffset,
+      dy: dyOffset,
+    );
+  }
+
   Future<void> findAndTap(SerializableFinder finder,
       {Duration timeout, SerializableFinder scrollable}) async {
     await _findBeforeAction(finder, scrollable: scrollable);
-    await _driver.tap(finder, timeout: timeout);
+    await  _driver.tap(finder, timeout: timeout);
+    await _resetAfterAction(scrollable);
   }
 
   Future<void> findAndDoubleTap(SerializableFinder finder,
@@ -131,6 +145,7 @@ class DriverExtension {
     await _findBeforeAction(finder, scrollable: scrollable);
     _driver.tap(finder);
     await _driver.tap(finder, timeout: timeout);
+    await _resetAfterAction(scrollable);
   }
 
   Future<void> findAndLongPress(SerializableFinder finder,
@@ -138,6 +153,7 @@ class DriverExtension {
     await _findBeforeAction(finder, scrollable: scrollable);
     await _driver.scroll(finder, 0, 0, Duration(milliseconds: 500),
         timeout: timeout);
+    await _resetAfterAction(scrollable);
   }
 
   Future<void> tapByType(String target,
@@ -189,6 +205,7 @@ class DriverExtension {
       {SerializableFinder scrollable}) async {
     await findAndTap(finder, scrollable: scrollable);
     await _driver.enterText(text);
+    await _resetAfterAction(scrollable);
   }
 
   Future<void> enterTextByType(String target, String text,
