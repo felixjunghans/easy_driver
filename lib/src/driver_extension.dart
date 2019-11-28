@@ -136,10 +136,14 @@ class DriverExtension {
   }
 
   Future<void> findAndTap(SerializableFinder finder,
-      {Duration timeout, SerializableFinder scrollable}) async {
+      {Duration timeout,
+      SerializableFinder scrollable,
+      bool withReset = true}) async {
     await _findBeforeAction(finder, scrollable: scrollable);
     await _driver.tap(finder, timeout: timeout);
-    await _resetAfterAction(scrollable);
+    if (withReset) {
+      await _resetAfterAction(scrollable);
+    }
   }
 
   Future<void> findAndDoubleTap(SerializableFinder finder,
@@ -205,7 +209,7 @@ class DriverExtension {
 
   Future<void> findAndEnterText(SerializableFinder finder, String text,
       {SerializableFinder scrollable}) async {
-    await findAndTap(finder, scrollable: scrollable);
+    await findAndTap(finder, scrollable: scrollable, withReset: false);
     await _driver.enterText(text);
     await _resetAfterAction(scrollable);
   }
@@ -251,13 +255,14 @@ class DriverExtension {
   Future<void> selectItem(
       SerializableFinder dropDownButton, SerializableFinder item,
       {SerializableFinder scrollable, SerializableFinder dismiss}) async {
-    await findAndTap(dropDownButton);
+    await findAndTap(dropDownButton, withReset: false);
     final menu = scrollable ?? find.byType("_DropdownMenu");
     await findAndTap(find.descendant(of: menu, matching: item),
         scrollable: menu);
     if (dismiss != null) {
       dismissOverlay();
     }
+    await _resetAfterAction(currentScreenFinder);
   }
 
   Future<void> closeDrawer({bool isLeft = true}) async {
