@@ -62,16 +62,20 @@ class DriverExtension {
     assert(dxScroll != 0.0 || dyScroll != 0.0);
 
     bool isVisible = false;
+    await resetScreenScrollPosition(scrollable,
+        dy: dyOffset <= 0 ? 10000 : dyOffset);
+
+
     _driver.waitFor(item, timeout: timeout).then<void>((_) {
       isVisible = true;
     });
-    
+
     await Future<void>.delayed(const Duration(milliseconds: 1000));
     while (!isVisible) {
       await _driver.scroll(
           scrollable, 0.0, -400.0, const Duration(milliseconds: 50),
           timeout: timeout);
-      dyOffset += -405;
+      dyOffset += 700;
       await Future<void>.delayed(const Duration(milliseconds: 100));
     }
 
@@ -80,7 +84,7 @@ class DriverExtension {
 
   Future<void> resetScreenScrollPosition(SerializableFinder scrollable,
       {double dx = 0, double dy = 10000}) async {
-    await _driver.scroll(scrollable, dx, dy, const Duration(milliseconds: 100),
+    await _driver.scroll(scrollable, dx, dy, const Duration(milliseconds: 500),
         timeout: Duration(seconds: 30));
     dyOffset = 0;
     dxOffset = 0;
@@ -130,23 +134,12 @@ class DriverExtension {
         dyScroll: 300, timeout: Duration(seconds: 30));
   }
 
-  Future<void> _resetAfterAction(SerializableFinder scrollable) async {
-    await resetScreenScrollPosition(
-      scrollable ?? currentScreenFinder,
-      dx: dxOffset,
-      dy: dyOffset,
-    );
-  }
-
   Future<void> findAndTap(SerializableFinder finder,
       {Duration timeout,
       SerializableFinder scrollable,
       bool withReset = true}) async {
     await _findBeforeAction(finder, scrollable: scrollable);
     await _driver.tap(finder, timeout: timeout);
-    if (withReset) {
-      await _resetAfterAction(scrollable);
-    }
   }
 
   Future<void> findAndDoubleTap(SerializableFinder finder,
@@ -154,7 +147,6 @@ class DriverExtension {
     await _findBeforeAction(finder, scrollable: scrollable);
     _driver.tap(finder);
     await _driver.tap(finder, timeout: timeout);
-    await _resetAfterAction(scrollable);
   }
 
   Future<void> findAndLongPress(SerializableFinder finder,
@@ -162,7 +154,6 @@ class DriverExtension {
     await _findBeforeAction(finder, scrollable: scrollable);
     await _driver.scroll(finder, 0, 0, Duration(milliseconds: 500),
         timeout: timeout);
-    await _resetAfterAction(scrollable);
   }
 
   Future<void> tapByType(String target,
@@ -214,7 +205,6 @@ class DriverExtension {
       {SerializableFinder scrollable}) async {
     await findAndTap(finder, scrollable: scrollable, withReset: false);
     await _driver.enterText(text);
-    await _resetAfterAction(scrollable);
   }
 
   Future<void> enterTextByType(String target, String text,
@@ -265,7 +255,6 @@ class DriverExtension {
     if (dismiss != null) {
       dismissOverlay();
     }
-    await _resetAfterAction(currentScreenFinder);
   }
 
   Future<void> closeDrawer({bool isLeft = true}) async {

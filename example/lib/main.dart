@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 void main() => runApp(MyApp());
@@ -27,7 +26,15 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Plugin example app'),
         ),
         body: ListView(children: [
-          ...List.generate(500, (x) => Text('List element ' + x.toString())),
+          ...List.generate(
+              500,
+              (x) => InkWell(
+                  onTap: () => print("Tapped $x"),
+                  child: Container(
+                      padding: EdgeInsets.all(
+                        10.0,
+                      ),
+                      child: Text('List element ' + x.toString())))),
           SizedBox(
             height: 100,
           ),
@@ -42,11 +49,11 @@ class _MyAppState extends State<MyApp> {
             },
             items: List.generate(
                 100,
-                    (x) => DropdownMenuItem<int>(
-                  key: Key("item_$x"),
-                  value: x,
-                  child: Text('Select element ' + x.toString()),
-                )),
+                (x) => DropdownMenuItem<int>(
+                      key: Key("item_$x"),
+                      value: x,
+                      child: Text('Select element ' + x.toString()),
+                    )),
           )
         ]),
       ),
