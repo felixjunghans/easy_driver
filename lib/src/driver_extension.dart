@@ -146,7 +146,9 @@ class DriverExtension {
       double dyScroll = -400,
       bool withReset = true}) async {
     await _findBeforeAction(finder, scrollable: scrollable, dyScroll: dyScroll);
+    print("FOUND");
     await _driver.tap(finder, timeout: timeout);
+    print("TAPPED");
   }
 
   Future<void> findAndDoubleTap(SerializableFinder finder,

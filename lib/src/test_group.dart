@@ -66,14 +66,18 @@ abstract class TestGroup {
   }
 
   Future<void> traceAction(Function test, String title) async {
-    final timeline = await _driver.driver.traceAction(() async {
+    if(false) {
+      final timeline = await _driver.driver.traceAction(() async {
+        await test();
+      });
+      final summary = new TimelineSummary.summarize(timeline);
+      summary.writeSummaryToFile(title,
+          destinationDirectory:
+          "$_reportDirectory/$_groupFolderName/performance/",
+          pretty: true);
+    } else {
       await test();
-    });
-    final summary = new TimelineSummary.summarize(timeline);
-    summary.writeSummaryToFile(title,
-        destinationDirectory:
-            "$_reportDirectory/$_groupFolderName/performance/",
-        pretty: true);
+    }
   }
 
   void runTests({
