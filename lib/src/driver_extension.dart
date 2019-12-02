@@ -259,6 +259,7 @@ class DriverExtension {
     final menu = scrollable ?? find.byType("_DropdownMenu");
     await findAndTap(find.descendant(of: menu, matching: item),
         scrollable: menu, dyScroll: -100);
+    print("DISMISS NEXT");
     if (dismiss != null) {
       dismissOverlay();
     }
