@@ -49,7 +49,7 @@ class DriverExtension {
     SerializableFinder item, {
     double alignment = 0.0,
     double dxScroll = 0.0,
-    double dyScroll = 0.0,
+    double dyScroll = -400.0,
     Duration timeout = const Duration(seconds: 30),
   }) async {
     assert(scrollable != null);
@@ -65,7 +65,6 @@ class DriverExtension {
     await resetScreenScrollPosition(scrollable,
         dy: dyOffset <= 0 ? 10000 : dyOffset);
 
-
     _driver.waitFor(item, timeout: timeout).then<void>((_) {
       isVisible = true;
     });
@@ -73,9 +72,9 @@ class DriverExtension {
     await Future<void>.delayed(const Duration(milliseconds: 1000));
     while (!isVisible) {
       await _driver.scroll(
-          scrollable, 0.0, -400.0, const Duration(milliseconds: 50),
+          scrollable, dxScroll, dyScroll, const Duration(milliseconds: 50),
           timeout: timeout);
-      dyOffset += 700;
+      dyOffset += dyScroll + (dyScroll < 0 ? -300 : 300);
       await Future<void>.delayed(const Duration(milliseconds: 100));
     }
 
@@ -129,16 +128,17 @@ class DriverExtension {
   }
 
   Future<void> _findBeforeAction(SerializableFinder finder,
-      {SerializableFinder scrollable}) async {
+      {SerializableFinder scrollable, double dyScroll: -400}) async {
     await findWidgetOnScreen(scrollable ?? currentScreenFinder, finder,
-        dyScroll: 300, timeout: Duration(seconds: 30));
+        dyScroll: dyScroll, timeout: Duration(seconds: 30));
   }
 
   Future<void> findAndTap(SerializableFinder finder,
       {Duration timeout,
       SerializableFinder scrollable,
+      double dyScroll = -400,
       bool withReset = true}) async {
-    await _findBeforeAction(finder, scrollable: scrollable);
+    await _findBeforeAction(finder, scrollable: scrollable, dyScroll: dyScroll);
     await _driver.tap(finder, timeout: timeout);
   }
 
@@ -251,7 +251,7 @@ class DriverExtension {
     await findAndTap(dropDownButton, withReset: false);
     final menu = scrollable ?? find.byType("_DropdownMenu");
     await findAndTap(find.descendant(of: menu, matching: item),
-        scrollable: menu);
+        scrollable: menu, dyScroll: -40);
     if (dismiss != null) {
       dismissOverlay();
     }
