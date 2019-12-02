@@ -146,9 +146,7 @@ class DriverExtension {
       double dyScroll = -400,
       bool withReset = true}) async {
     await _findBeforeAction(finder, scrollable: scrollable, dyScroll: dyScroll);
-    print("FOUND");
     await _driver.tap(finder, timeout: timeout);
-    print("TAPPED");
   }
 
   Future<void> findAndDoubleTap(SerializableFinder finder,
@@ -248,9 +246,11 @@ class DriverExtension {
 
   Future<void> dismissOverlay([SerializableFinder modalBarrier]) async {
     if (modalBarrier != null) {
-      await findAndTap(modalBarrier);
+      await _driver.tap(modalBarrier);
+      //  await findAndTap(modalBarrier);
     } else {
-      await findAndTap(_getAppropriateFinder(FinderType.type, 'ModalBarrier'));
+      await _driver.tap(_getAppropriateFinder(FinderType.type, 'ModalBarrier'));
+      //  await findAndTap(_getAppropriateFinder(FinderType.type, 'ModalBarrier'));
     }
   }
 
