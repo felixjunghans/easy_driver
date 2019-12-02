@@ -71,7 +71,7 @@ class DriverExtension {
 
     await Future<void>.delayed(const Duration(milliseconds: 1000));
 
-    if(!isVisible) {
+    if (!isVisible) {
       // try to wait for another 2 seconds and find widget if
       // scrolling on top is taking to long
       await Future<void>.delayed(const Duration(milliseconds: 2000));
@@ -257,9 +257,9 @@ class DriverExtension {
       {SerializableFinder scrollable, SerializableFinder dismiss}) async {
     await findAndTap(dropDownButton, withReset: false);
     final menu = scrollable ?? find.byType("_DropdownMenu");
-    await findAndTap(find.descendant(of: menu, matching: item),
-        scrollable: menu, dyScroll: -100);
-    print("DISMISS NEXT");
+
+    // find.descendant(of: menu, matching: item)
+    await findAndTap(item, scrollable: menu, dyScroll: -100);
     if (dismiss != null) {
       dismissOverlay();
     }
