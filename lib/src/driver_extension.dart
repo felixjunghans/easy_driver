@@ -259,11 +259,15 @@ class DriverExtension {
       {SerializableFinder scrollable, SerializableFinder dismiss}) async {
     await findAndTap(dropDownButton, withReset: false);
     final menu = scrollable ?? find.byType("_DropdownMenu");
+    final double dyScroll = -100;
 
-    // find.descendant(of: menu, matching: item)
-    await findAndTap(item, scrollable: menu, dyScroll: -100);
+    await findWidgetOnScreen(menu, find.descendant(of: menu, matching: item),
+        dyScroll: dyScroll);
     if (dismiss != null) {
       dismissOverlay();
+    } else {
+      await findAndTap(find.descendant(of: menu, matching: item),
+          scrollable: menu, dyScroll: dyScroll);
     }
   }
 
